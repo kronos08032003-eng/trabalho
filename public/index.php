@@ -124,5 +124,23 @@ $app->post('/pilotos', function ($request, $response) use (&$pilotos) {
     return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 });
 
+$app->put('/pilotos/{id}', function ($request, $response, $args) use (&$pilotos) {
+    $dados = $request->getParsedBody();
+    foreach ($pilotos as &$piloto) {
+        if ($piloto['id'] === (int) $args['id']) {
+            $piloto['nome'] = $dados['nome'];
+            $piloto['pontos'] = $dados['pontos'];
+            $response->getBody()->write(json_encode($piloto));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        }
+    }
+    return $response->withStatus(404);
+});
+
+$app->delete('/pilotos/{id}', function ($request, $response, $args) use (&$pilotos) {
+    $pilotos = array_values(array_filter($pilotos, fn($p) => $p['id'] !== (int) $args['id']));
+    return $response->withStatus(204);
+});
+
 $app->run();
  
